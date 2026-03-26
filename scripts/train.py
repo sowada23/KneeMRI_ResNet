@@ -19,7 +19,7 @@ def main():
 
     cfg = load_config(args.config, PROJECT_ROOT)
     cfg = prepare_train_paths(cfg)
-    save_json(cfg.__dict__, cfg.BASE_OUTPUT_DIR / "config_used.json")
+    save_json(cfg.__dict__, cfg.LOG_DIR/ "config_used.json")
 
     train(cfg)
 

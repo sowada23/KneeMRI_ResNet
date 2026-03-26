@@ -76,12 +76,12 @@ def test(cfg):
             },
             "patient_metrics": build_split_summary("test", te_pat)["metrics"],
         },
-        cfg.BASE_OUTPUT_DIR / "test"/ "test_summary.json"
+        cfg.LOG_DIR/ "test"/ "test_summary.json"
     )
 
     save_json(
         build_split_patient_report("test", te_pat),
-        cfg.BASE_OUTPUT_DIR / "test" / "test_patient_details.json"
+        cfg.LOG_DIR / "test" / "test_patient_details.json"
     )
 
     print_patient_confusion_matrix(
@@ -90,7 +90,7 @@ def test(cfg):
         device=device,
         cfg=cfg,
         threshold=best_t,
-        save_path=cfg.LOG_DIR / "test " / "confusion_matrix.png"
+        save_path=cfg.LOG_DIR / "test" / "confusion_matrix.png"
     )
 
     print_patient_case_rows(te_pat, "fp")
