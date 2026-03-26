@@ -95,13 +95,6 @@ def train(cfg):
         tr = train_one_epoch(model, train_loader, optimizer, device, scaler, criterion)
         va = evaluate(model, val_loader, device, criterion)
 
-        best = find_best_threshold_patient(
-            model=model,
-            loader=val_loader,
-            device=device,
-            cfg=cfg,
-            metric_name="f1", 
-        )
         # Fixed-threshold monitoring during training only
         va_pat = evaluate_patientwise(
             model=model,
