@@ -3,24 +3,6 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-
-def zscore_normalize(arr, nonzero_only=True, eps=1e-8):
-    arr = arr.astype(np.float32).copy()
-
-    if nonzero_only:
-        mask = arr != 0
-        if mask.sum() == 0:
-            return arr
-        mean = arr[mask].mean()
-        std = arr[mask].std()
-        arr[mask] = (arr[mask] - mean) / (std + eps)
-        return arr
-    else:
-        mean = arr.mean()
-        std = arr.std()
-        return (arr - mean) / (std + eps)
-
-
 class KneeDataset(Dataset):
     def __init__(self, data_root, tfm=None, use_zscore=True, zscore_nonzero_only=True):
         self.tfm = tfm
@@ -44,15 +26,12 @@ class KneeDataset(Dataset):
         arr = np.load(path).astype(np.float32)
         if arr.ndim != 2:
             raise ValueError(f"Expected 2D array, got {arr.shape} for {path}")
-
-        if self.use_zscore:
-            arr = zscore_normalize(arr, nonzero_only=self.zscore_nonzero_only)
-
+        
         x = torch.from_numpy(arr).unsqueeze(0)   # [1, H, W]
 
         if self.tfm is not None:
             x = self.tfm(x)
-
+            
         y = torch.tensor(y, dtype=torch.float32)
         return x, y, pid
 
