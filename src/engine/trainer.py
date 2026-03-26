@@ -5,6 +5,11 @@ import numpy as np
 from src.utils.freeze import print_trainable_params, setup_layer4_layer3_fc
 from src.utils.reproducibility import set_seed
 from src.utils.checkpoint import save_checkpoint, EarlyStopping
+from src.utils.history import (
+    save_json,
+    build_split_summary,
+    build_split_patient_report,
+)
 from src.data.datamodule import build_train_val_loaders
 from src.models.resnet50_binary import Resnet50
 from src.engine.evaluator import evaluate
@@ -219,6 +224,28 @@ def train(cfg):
     )
 
     print(f"Final tuned threshold from validation set: {final_t:.2f}")
+
+    save_json(
+        {
+            "history": history,
+            "best_val_metric": best_val,
+            "final_threshold": float(final_t),
+            "aggregation_mode": cfg.AGG,
+            "top_k": cfg.TOP_K,
+        },
+        cfg.BASE_OUTPUT_DIR / "train_history.json"
+    )
+
+    save_json(
+        build_split_summary("val", final_val_pat),
+        cfg.BASE_OUTPUT_DIR / "val_summary.json"
+    )
+
+    save_json(
+        build_split_patient_report("val", final_val_pat),
+        cfg.BASE_OUTPUT_DIR / "val_patient_details.json"
+    )
+
             
     plot_train_val_curves(
         history,
@@ -246,8 +273,30 @@ def train(cfg):
         final_val_pat["y_score"],
         save_path=cfg.LOG_DIR / "val_patient_roc_curve.png"
     )
+    train_history = {
+        "history": history,
+        "final_threshold": final_t,
+        "best_val_metric": best_val,
+    }
 
-    fp_rows, fp_ids = print_patient_case_rows(final_val_pat, "fp")
-    fn_rows, fn_ids = print_patient_case_rows(final_val_pat, "fn")
+    train_summary = {
+        "best_val_metric": best_val,
+        "final_threshold": final_t,
+        "final_val_patient_metrics": {
+            "loss": final_val_pat["loss"],
+            "roc_auc": final_val_pat["roc_auc"],
+            "acc": final_val_pat["acc"],
+            "precision": final_val_pat["precision"],
+            "recall": final_val_pat["recall"],
+            "f1": final_val_pat["f1"],
+            "tp": final_val_pat["tp"],
+            "fp": final_val_pat["fp"],
+            "tn": final_val_pat["tn"],
+            "fn": final_val_pat["fn"],
+        },
+    }
+
+    print_patient_case_rows(final_val_pat, "fp")
+    print_patient_case_rows(final_val_pat, "fn")
 
     print("\nTraining finished")
