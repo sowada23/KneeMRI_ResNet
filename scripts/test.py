@@ -2,7 +2,6 @@ import argparse
 import sys
 from pathlib import Path
 import torch
-from src.utils.history import save_json, build_split_summary, build_split_patient_report
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -10,6 +9,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from src.utils.config import load_config
 from src.utils.paths import prepare_test_paths
+from src.utils.history import save_json, build_split_summary, build_split_patient_report
 from src.data.datamodule import build_test_loader
 from src.models.resnet50_binary import Resnet50
 from src.engine.evaluator import evaluate
