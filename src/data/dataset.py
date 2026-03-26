@@ -4,11 +4,9 @@ import torch
 from torch.utils.data import Dataset
 
 class KneeDataset(Dataset):
-    def __init__(self, data_root, tfm=None, use_zscore=True, zscore_nonzero_only=True):
+    def __init__(self, data_root, tfm=None):
         self.tfm = tfm
         self.data_root = Path(data_root)
-        self.use_zscore = use_zscore
-        self.zscore_nonzero_only = zscore_nonzero_only
         self.samples = []
 
         for npy_path in self.data_root.rglob("*.npy"):
