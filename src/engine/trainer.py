@@ -226,17 +226,17 @@ def train(cfg):
             "aggregation_mode": cfg.AGG,
             "top_k": cfg.TOP_K,
         },
-        cfg.BASE_OUTPUT_DIR / "train"/ "train_history.json"
+        cfg.LOG_DIR / "train"/ "train_history.json"
     )
 
     save_json(
         build_split_summary("val", final_val_pat),
-        cfg.BASE_OUTPUT_DIR / "val" / "val_summary.json"
+        cfg.LOG_DIR / "val" / "val_summary.json"
     )
 
     save_json(
         build_split_patient_report("val", final_val_pat),
-        cfg.BASE_OUTPUT_DIR / "val"/ "val_patient_details.json"
+        cfg.LOG_DIR/ "val"/ "val_patient_details.json"
     )
 
             
