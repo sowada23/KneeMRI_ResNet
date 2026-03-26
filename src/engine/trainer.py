@@ -196,8 +196,29 @@ def train(cfg):
     final_t = best["t"]
     final_val_pat = best["metric"]
 
-    print(f"Final tuned threshold from validation set: {final_t:.2f}")
+    save_checkpoint(
+        cfg.CKPT_DIR / "best.ckpt",
+        model=model,
+        optimizer=optimizer,
+        scaler=scaler,
+        scheduler=None,
+        epoch=epoch,
+        best_val=best_val,
+        cfg=cfg,
+        extra={
+            "val_loss": float(va["loss"]),
+            "val_acc": float(va["acc"]),
+            "best_t": float(final_t),
+            "val_pat_acc": float(final_val_pat["acc"]),
+            "val_pat_precision": float(final_val_pat["precision"]),
+            "val_pat_recall": float(final_val_pat["recall"]),
+            "val_pat_f1": float(final_val_pat["f1"]),
+            "val_pat_loss": float(final_val_pat["loss"]),
+            "val_pat_roc_auc": float(final_val_pat["roc_auc"]) if not np.isnan(final_val_pat["roc_auc"]) else None,
+            }
+    )
 
+    print(f"Final tuned threshold from validation set: {final_t:.2f}")
             
     plot_train_val_curves(
         history,
