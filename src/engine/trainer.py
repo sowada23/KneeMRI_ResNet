@@ -165,7 +165,7 @@ def train(cfg):
             }
         )
 
-        current = float(va_pat["f1"])
+        current = float(va_pat["loss"])
         if epoch == 1 or current > best_val:
             best_val = current
             save_checkpoint(
