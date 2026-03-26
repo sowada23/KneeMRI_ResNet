@@ -29,6 +29,8 @@ def aggregate_patient_score(probs, cfg):
     if len(probs) == 0:
         return 0.0
 
+    probs = np.asarray(probs, dtype=np.float32)
+
     if mode == "mean":
         return float(np.mean(probs))
     if mode == "max":
@@ -36,8 +38,15 @@ def aggregate_patient_score(probs, cfg):
     if mode == "topk_mean":
         k = min(cfg.TOP_K, len(probs))
         return float(np.mean(np.sort(probs)[-k:]))
+    if mode == "p90":
+        return float(np.percentile(probs, 90))
+    if mode == "p95":
+        return float(np.percentile(probs, 95))
+    if mode == "median":
+        return float(np.median(probs))
 
     raise ValueError(f"Unknown aggregation mode: {mode}")
+
 
 def get_patient_case_rows(metrics, case):
     """
