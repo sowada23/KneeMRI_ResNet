@@ -22,10 +22,6 @@ def main():
     cfg = prepare_train_paths(cfg)
     save_json(cfg.__dict__, cfg.BASE_OUTPUT_DIR / "config_used.json")
 
-    print(f"Project root: {cfg.PROJECT_ROOT}")
-    print(f"Data dir:      {cfg.DATA_DIR}")
-    print(f"Output dir:    {cfg.BASE_OUTPUT_DIR}")
-
     train(cfg)
 
 
