@@ -2,6 +2,7 @@ import argparse
 import sys
 from pathlib import Path
 import torch
+from src.utils.history import save_json, build_split_summary, build_split_patient_report
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -12,7 +13,7 @@ from src.utils.paths import prepare_test_paths
 from src.data.datamodule import build_test_loader
 from src.models.resnet50_binary import Resnet50
 from src.engine.evaluator import evaluate
-from src.metrics.patientwise import evaluate_patientwise, print_final_fp_patients, print_final_fn_patients
+from src.metrics.patientwise import evaluate_patientwise, print_patient_case_rows
 from src.viz.confusion import print_patient_confusion_matrix
 
 
@@ -65,7 +66,25 @@ def test(cfg):
         cfg, threshold=best_t
     )
 
-    cm, test_pat_metrics = print_patient_confusion_matrix(
+    save_json(
+        {
+            "checkpoint_used": str(cfg.CKPT_PATH),
+            "threshold_used": float(best_t),
+            "slice_metrics": {
+                "loss": float(te["loss"]),
+                "acc": float(te["acc"]),
+            },
+            "patient_metrics": build_split_summary("test", te_pat)["metrics"],
+        },
+        cfg.BASE_OUTPUT_DIR / "test_summary.json"
+    )
+
+    save_json(
+        build_split_patient_report("test", te_pat),
+        cfg.BASE_OUTPUT_DIR / "test_patient_details.json"
+    )
+
+    print_patient_confusion_matrix(
         model=model,
         loader=test_loader,
         device=device,
@@ -74,8 +93,8 @@ def test(cfg):
         save_path=cfg.LOG_DIR / "confusion_matrix.png"
     )
 
-    fp_case_rows, fp_case_ids = print_final_fp_patients(te_pat)
-    fn_case_rows, fn_case_ids = print_final_fn_patients(te_pat)
+    print_patient_case_rows(te_pat, "fp")
+    print_patient_case_rows(te_pat, "fn")
 
     print(f"\n[TEST slice] loss={te['loss']:.4f} acc={te['acc']:.4f}")
     print(f"[TEST patient] patients={te_pat['patients']} acc={te_pat['acc']:.4f} "
