@@ -226,17 +226,17 @@ def train(cfg):
             "aggregation_mode": cfg.AGG,
             "top_k": cfg.TOP_K,
         },
-        cfg.BASE_OUTPUT_DIR / "train_history.json"
+        cfg.BASE_OUTPUT_DIR / "train"/ "train_history.json"
     )
 
     save_json(
         build_split_summary("val", final_val_pat),
-        cfg.BASE_OUTPUT_DIR / "val_summary.json"
+        cfg.BASE_OUTPUT_DIR / "val" / "val_summary.json"
     )
 
     save_json(
         build_split_patient_report("val", final_val_pat),
-        cfg.BASE_OUTPUT_DIR / "val_patient_details.json"
+        cfg.BASE_OUTPUT_DIR / "val"/ "val_patient_details.json"
     )
 
             
@@ -247,24 +247,24 @@ def train(cfg):
 
     plot_prf_acc_curves(
         history,
-        save_path=cfg.LOG_DIR / "val_pat_prf_acc.png",
+        save_path=cfg.LOG_DIR / "val" / "val_pat_prf_acc.png",
         split="val_pat"
     )
 
     plot_patient_val_loss(
         history,
-        save_path=cfg.LOG_DIR / "val_patient_loss.png"
+        save_path=cfg.LOG_DIR / "val" / "val_patient_loss.png"
     )
     
     plot_patient_val_f1(
         history,
-        save_path=cfg.LOG_DIR / "val_patient_f1.png"
+        save_path=cfg.LOG_DIR / "val" / "val_patient_f1.png"
     )
     
     plot_patient_roc_curve(
         final_val_pat["y_true"],
         final_val_pat["y_score"],
-        save_path=cfg.LOG_DIR / "val_patient_roc_curve.png"
+        save_path=cfg.LOG_DIR / "val" / "val_patient_roc_curve.png"
     )
     train_history = {
         "history": history,
