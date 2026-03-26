@@ -24,7 +24,7 @@ class Config:
     WEIGHT_DECAY: float = 1e-3
     NUM_EPOCH: int = 50
     SEED: int = 42
-    THRESHOLD: float = 0.55
+    THRESHOLD: float = 0.5
     PATIENCE: int = 15
     MIN_DELTA: float = 1e-4
     TOP_K: int = 3
