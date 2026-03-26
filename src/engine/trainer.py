@@ -11,8 +11,6 @@ from src.engine.evaluator import evaluate
 from src.metrics.patientwise import (
     evaluate_patientwise,
     find_best_threshold_patient,
-    print_final_fp_patients,
-    print_final_fn_patients,
     print_patient_case_rows,
 )
 from src.viz.plots import (
@@ -97,13 +95,19 @@ def train(cfg):
             loader=val_loader,
             device=device,
             cfg=cfg,
-            metric_name="f1",   # or "recall" if you care more about FN reduction
+            metric_name="f1", 
+        )
+        # Fixed-threshold monitoring during training only
+        va_pat = evaluate_patientwise(
+            model=model,
+            loader=val_loader,
+            device=device,
+            cfg=cfg,
+            threshold=cfg.THRESHOLD,
         )
 
-        best_t = best["t"]
-        va_pat = best["metric"]
-
-        should_stop, improved = early.step(va_pat["f1"], model)
+        should_stop, improved = early.step(va["loss"], model)
+        best_t = cfg.THRESHOLD
 
         if should_stop:
             print("Early stopping triggered. Restoring best model weights.")
@@ -188,9 +192,11 @@ def train(cfg):
         cfg=cfg,
         metric_name="f1",
     )
-    
+
     final_t = best["t"]
     final_val_pat = best["metric"]
+
+    print(f"Final tuned threshold from validation set: {final_t:.2f}")
 
             
     plot_train_val_curves(
