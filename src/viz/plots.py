@@ -70,9 +70,6 @@ def plot_prf_acc_curves(history: dict, save_path=None, split: str = "val") -> No
 
     plt.show()
 
-from pathlib import Path
-import matplotlib.pyplot as plt
-
 
 def plot_patient_val_loss(history, save_path=None):
     epochs = list(range(1, len(history["val_pat_loss"]) + 1))

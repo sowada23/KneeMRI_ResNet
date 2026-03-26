@@ -4,8 +4,6 @@ import cv2
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
-from PIL import Image
-from src.data.dataset import zscore_normalize
 
 
 
@@ -187,7 +185,6 @@ def save_patient_middle3_gradcams(
                 raise ValueError(f"Expected 2D array, got {arr.shape} for {npy_path}")
 
             arr_proc = arr.astype(np.float32)
-            arr_proc = zscore_normalize(arr_proc, nonzero_only=True)
             x = torch.from_numpy(arr_proc).unsqueeze(0)
             
             if eval_transform is not None:
