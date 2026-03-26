@@ -16,7 +16,10 @@ MIN_DELTA: 0.0001
 TOP_K: 3
 USE_AMP: true
 
-MODE: max
-AGG: topk_mean
+MODE: min 
+AGG: mean # mean, max, topk_mean, p90, p95, median
 
 MODEL_WEIGHT: DEFAULT
+
+IMAGENET_MEAN: [0.485, 0.456, 0.406]
+IMAGENET_STD: [0.229, 0.224, 0.225]
