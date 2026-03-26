@@ -32,8 +32,8 @@ class Config:
     MODE: str = "max"
     AGG: str = "mean"
     MODEL_WEIGHT: object = models.ResNet50_Weights.DEFAULT
-    IMAGENET_MEAN: list = [0.485, 0.456, 0.406]
-    IMAGENET_STD:  list = [0.229, 0.224, 0.225]
+    IMAGENET_MEAN  = [0.485, 0.456, 0.406]
+    IMAGENET_STD   = [0.229, 0.224, 0.225]
 
 def _resolve_path(project_root: Path, value):
     p = Path(value)
