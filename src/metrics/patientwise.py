@@ -236,7 +236,7 @@ def find_best_threshold_patient(model, loader, device, cfg, thresholds=None, met
         m = evaluate_patientwise(model, loader, device, cfg, threshold=float(t))
         score = float(m[metric_name])
 
-        if (score > best["score"]) or (score == best["score"] and float(t) > best["t"]):
+        if (score > best["score"]) or (score == best["score"] and (best["t"] < 0 or float(t) < best["t"])):
             best = {
                 "t": float(t),
                 "score": score,
