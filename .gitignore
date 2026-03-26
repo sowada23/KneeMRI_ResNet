@@ -8,6 +8,7 @@ outputs/
 runs/
 checkpoints/
 wandb/
+docs/
 
 *.pt
 *.pth
