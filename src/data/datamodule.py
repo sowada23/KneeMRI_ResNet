@@ -9,16 +9,12 @@ def build_train_val_loaders(cfg):
 
     train_ds = KneeDataset(
         train_root, 
-        build_train_transforms(cfg), 
-        use_zscore=True,  
-        zscore_nonzero_only=True,
+        build_train_transforms(cfg),  
     )
     
     val_ds = KneeDataset(
         val_root, 
         build_eval_transforms(cfg), 
-        use_zscore=True, 
-        zscore_nonzero_only=True,
     )
 
     train_loader = DataLoader(
@@ -47,8 +43,6 @@ def build_test_loader(cfg):
     test_ds = KneeDataset(
         test_root, 
         build_eval_transforms(cfg),
-        use_zscore=True,
-        zscore_nonzero_only=True,
     )
 
     test_loader = DataLoader(
