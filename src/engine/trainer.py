@@ -74,7 +74,7 @@ def train(cfg):
     scaler = torch.amp.GradScaler("cuda") if (cfg.USE_AMP and device.type == "cuda") else None
 
     start_epoch = 1
-    best_val = float("-inf")
+    best_val = float("inf")
 
     history = {
         "train_loss": [],
@@ -158,8 +158,8 @@ def train(cfg):
             }
         )
 
-        current = float(va_pat["loss"])
-        if epoch == 1 or current > best_val:
+        current = float(va["loss"])
+        if epoch == 1 or current < best_val:
             best_val = current
             save_checkpoint(
                 cfg.CKPT_DIR / "best.ckpt",
