@@ -2,7 +2,7 @@ import torch
 import torch.optim as optim
 import numpy as np
 
-from src.utils.freeze import print_trainable_params, setup_fc_only, setup_layer4_fc, setup_layer4_layer3_fc, 
+from src.utils.freeze import print_trainable_params, setup_fc_only, setup_layer4_fc, setup_layer4_layer3_fc
 from src.utils.reproducibility import set_seed
 from src.utils.checkpoint import save_checkpoint, EarlyStopping
 from src.utils.history import (
