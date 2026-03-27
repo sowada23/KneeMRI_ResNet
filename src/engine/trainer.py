@@ -266,28 +266,6 @@ def train(cfg):
         final_val_pat["y_score"],
         save_path=cfg.LOG_DIR / "val" / "val_patient_roc_curve.png"
     )
-    train_history = {
-        "history": history,
-        "final_threshold": final_t,
-        "best_val_metric": best_val,
-    }
-
-    train_summary = {
-        "best_val_metric": best_val,
-        "final_threshold": final_t,
-        "final_val_patient_metrics": {
-            "loss": final_val_pat["loss"],
-            "roc_auc": final_val_pat["roc_auc"],
-            "acc": final_val_pat["acc"],
-            "precision": final_val_pat["precision"],
-            "recall": final_val_pat["recall"],
-            "f1": final_val_pat["f1"],
-            "tp": final_val_pat["tp"],
-            "fp": final_val_pat["fp"],
-            "tn": final_val_pat["tn"],
-            "fn": final_val_pat["fn"],
-        },
-    }
 
     print_patient_case_rows(final_val_pat, "fp")
     print_patient_case_rows(final_val_pat, "fn")
