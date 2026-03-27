@@ -65,7 +65,7 @@ def train(cfg):
     criterion = torch.nn.BCEWithLogitsLoss()
 
     model = Resnet50(cfg).to(device)
-    model = setup_layer4_fc(model)
+    model = setup_layer4_layer3_fc(model)
 
     print_trainable_params(model)
 
@@ -104,7 +104,7 @@ def train(cfg):
             threshold=cfg.THRESHOLD,
         )
 
-        should_stop, improved = early.step(va["loss"], model)
+        should_stop, improved = early.step(va_pat["loss"], model)
         best_t = cfg.THRESHOLD
 
         if should_stop:
@@ -158,7 +158,7 @@ def train(cfg):
             }
         )
 
-        current = float(va["loss"])
+        current = float(va_pat["loss"])
         if epoch == 1 or current < best_val:
             best_val = current
             save_checkpoint(
