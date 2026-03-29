@@ -105,7 +105,33 @@ def test(cfg):
           f"P={te_pat['precision']:.3f} R={te_pat['recall']:.3f} F1={te_pat['f1']:.3f} "
           f"(TP {te_pat['tp']} FP {te_pat['fp']} TN {te_pat['tn']} FN {te_pat['fn']})")
 
+    # Compare nearby thresholds for robustness analysis
+    candidate_thresholds = sorted(set([
+        round(best_t - 0.05, 2),
+        round(best_t, 2),
+        round(best_t + 0.05, 2),
+    ]))
+    candidate_thresholds = [t for t in candidate_thresholds if 0.0 <= t <= 1.0]
 
+    print("\nNearby-threshold comparison on test:")
+    for t in candidate_thresholds:
+        te_pat_t = evaluate_patientwise(
+            model=model,
+            loader=test_loader,
+            device=device,
+            cfg=cfg,
+            threshold=float(t),
+        )
+
+        print(
+            f"[TEST patient @ {t:.2f}] "
+            f"acc={te_pat_t['acc']:.4f} "
+            f"P={te_pat_t['precision']:.3f} "
+            f"R={te_pat_t['recall']:.3f} "
+            f"F1={te_pat_t['f1']:.3f} "
+            f"(TP {te_pat_t['tp']} FP {te_pat_t['fp']} TN {te_pat_t['tn']} FN {te_pat_t['fn']})"
+        )
+        
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default=str(PROJECT_ROOT / "configs" / "default.yaml"))
