@@ -64,7 +64,9 @@ def train(cfg):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     train_loader, val_loader = build_train_val_loaders(cfg)
-    criterion = torch.nn.BCEWithLogitsLoss()
+
+    pos_weight = torch.tensor([cfg.POS_WEIGHT], device=device)
+    criterion = torch.nn.BCEWithLogitsLoss(pos_weight=pos_weight)
 
     model = Resnet50(cfg).to(device)
     model = setup_layer4_fc(model)
@@ -185,6 +187,7 @@ def train(cfg):
             )
 
     early.restore_best(model)
+    
     best = find_best_threshold_patient(
         model=model,
         loader=val_loader,
@@ -193,8 +196,9 @@ def train(cfg):
         metric_name="f1",
     )
 
-    final_t = best["t"]
-    final_val_pat = best["metric"]
+    final_t = best["best_threshold"]
+    final_val_pat = best["best_metric"]
+    threshold_table = best["threshold_table"]
 
     save_checkpoint(
         cfg.CKPT_DIR / "best.ckpt",
@@ -218,7 +222,18 @@ def train(cfg):
             }
     )
 
-    print(f"Final tuned threshold from validation set: {final_t:.2f}")
+    top_rows = sorted(threshold_table, key=lambda r: (-r["score"], r["threshold"]))[:5]
+
+    print("\nTop validation thresholds:")
+    for row in top_rows:
+        print(
+            f"t={row['threshold']:.2f} | "
+            f"F1={row['f1']:.3f} | "
+            f"acc={row['acc']:.3f} | "
+            f"P={row['precision']:.3f} | "
+            f"R={row['recall']:.3f} | "
+            f"loss={row['loss']:.4f}"
+        )
 
     save_json(
         {
@@ -227,6 +242,8 @@ def train(cfg):
             "final_threshold": float(final_t),
             "aggregation_mode": cfg.AGG,
             "top_k": cfg.TOP_K,
+            "threshold_metric": "f1",
+            "threshold_table": threshold_table,
         },
         cfg.LOG_DIR / "train"/ "train_history.json"
     )
