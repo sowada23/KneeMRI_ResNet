@@ -22,6 +22,7 @@ class Config:
     NUM_WORKERS: int = 8
     LR: float = 1e-5
     WEIGHT_DECAY: float = 1e-3
+    DROPOUT: int = 0.3
     NUM_EPOCH: int = 50
     SEED: int = 42
     THRESHOLD: float = 0.5
@@ -32,8 +33,8 @@ class Config:
     MODE: str = "max"
     AGG: str = "mean"
     MODEL_WEIGHT: object = models.ResNet50_Weights.DEFAULT
-    IMAGENET_MEAN: tuple[float, float, float] = (0.485, 0.456, 0.406)
-    IMAGENET_STD: tuple[float, float, float] = (0.229, 0.224, 0.225)
+    MEAN: tuple[float, float, float] = (0.485, 0.456, 0.406)
+    STD: tuple[float, float, float] = (0.229, 0.224, 0.225)
 
 
 def _resolve_path(project_root: Path, value):
