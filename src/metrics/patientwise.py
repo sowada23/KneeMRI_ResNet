@@ -237,13 +237,29 @@ def print_final_fn_patients(metrics):
     
 def find_best_threshold_patient(model, loader, device, cfg, thresholds=None, metric_name="f1"):
     if thresholds is None:
-        thresholds = np.linspace(0.05, 0.95, 19)
+        thresholds = np.linspace(0.30, 0.70, 41)  # 0.30, 0.31, ..., 0.70
 
+    rows = []
     best = {"t": -1.0, "score": float("-inf"), "metric": None}
 
     for t in thresholds:
         m = evaluate_patientwise(model, loader, device, cfg, threshold=float(t))
         score = float(m[metric_name])
+
+        rows.append({
+            "threshold": float(t),
+            "score": score,
+            "acc": float(m["acc"]),
+            "precision": float(m["precision"]),
+            "recall": float(m["recall"]),
+            "f1": float(m["f1"]),
+            "loss": float(m["loss"]),
+            "roc_auc": None if np.isnan(m["roc_auc"]) else float(m["roc_auc"]),
+            "tp": int(m["tp"]),
+            "fp": int(m["fp"]),
+            "tn": int(m["tn"]),
+            "fn": int(m["fn"]),
+        })
 
         if (score > best["score"]) or (score == best["score"] and (best["t"] < 0 or float(t) < best["t"])):
             best = {
@@ -252,4 +268,10 @@ def find_best_threshold_patient(model, loader, device, cfg, thresholds=None, met
                 "metric": m,
             }
 
-    return best
+    return {
+        "best_threshold": float(best["t"]),
+        "best_score": float(best["score"]),
+        "best_metric": best["metric"],
+        "threshold_table": rows,
+    }
+
