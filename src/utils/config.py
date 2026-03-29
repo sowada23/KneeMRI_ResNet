@@ -32,6 +32,7 @@ class Config:
     USE_AMP: bool = True
     MODE: str = "max"
     AGG: str = "mean"
+    POS_WEIGHT: float = 1.06
     MODEL_WEIGHT: object = models.ResNet50_Weights.DEFAULT
     MEAN: tuple[float, float, float] = (0.485, 0.456, 0.406)
     STD: tuple[float, float, float] = (0.229, 0.224, 0.225)
