@@ -16,6 +16,7 @@ def build_train_transforms(cfg):
         transforms.Resize((224, 224)),
         transforms.RandomAffine(degrees=0, translate=(0.02, 0.02), scale=(0.98, 1.02)),
         transforms.Lambda(lambda x: torch.clamp(x, -3.0, 3.0)),
+        transforms.Lambda(lambda x: x.repeat(3, 1, 1)),
         transforms.Normalize(mean=cfg.MEAN, std=cfg.STD),
         AddGaussianNoise(std=0.01)
         
