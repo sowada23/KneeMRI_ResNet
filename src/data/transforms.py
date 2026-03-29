@@ -27,5 +27,6 @@ def build_eval_transforms(cfg):
     return transforms.Compose([
          transforms.Resize((224, 224)),
          transforms.Lambda(lambda x: torch.clamp(x, -3.0, 3.0)),
+         transforms.Lambda(lambda x: x.repeat(3, 1, 1)),
          transforms.Normalize(mean=cfg.MEAN, std=cfg.STD),
     ])
