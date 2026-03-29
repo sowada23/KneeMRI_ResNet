@@ -2,7 +2,7 @@ import torch
 import torch.optim as optim
 import numpy as np
 
-from src.utils.freeze import print_trainable_params, setup_fc_only, setup_layer4_fc, setup_layer4_layer3_fc
+from src.utils.freeze import print_trainable_params, setup_fc_only, setup_layer4_fc, setup_layer4_layer3_fc, setup_layer4_layer3_layer2_fc
 from src.utils.reproducibility import set_seed
 from src.utils.checkpoint import save_checkpoint, EarlyStopping
 from src.utils.history import (
@@ -12,6 +12,8 @@ from src.utils.history import (
 )
 from src.data.datamodule import build_train_val_loaders
 from src.models.resnet50_binary import Resnet50
+from src.models.resnet34_binary import Resnet34
+from src.models.resnet18_binary import Resnet18
 from src.engine.evaluator import evaluate
 from src.metrics.patientwise import (
     evaluate_patientwise,
@@ -65,9 +67,8 @@ def train(cfg):
     criterion = torch.nn.BCEWithLogitsLoss()
 
     model = Resnet50(cfg).to(device)
-    model = setup_layer4_layer3_fc(model)
-
-    print_trainable_params(model)
+    model = setup_layer4_fc(model)
+    print_trainable_params(model, save_path=cfg.LOG_DIR/ "train" / "trainable_params.txt")
 
     optimizer = torch.optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=cfg.LR, weight_decay=cfg.WEIGHT_DECAY)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=cfg.NUM_EPOCH)
@@ -183,6 +184,7 @@ def train(cfg):
                 }
             )
 
+    early.restore_best(model)
     best = find_best_threshold_patient(
         model=model,
         loader=val_loader,
@@ -266,8 +268,5 @@ def train(cfg):
         final_val_pat["y_score"],
         save_path=cfg.LOG_DIR / "val" / "val_patient_roc_curve.png"
     )
-
-    print_patient_case_rows(final_val_pat, "fp")
-    print_patient_case_rows(final_val_pat, "fn")
 
     print("\nTraining finished")
