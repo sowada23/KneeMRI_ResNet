@@ -9,9 +9,12 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from src.utils.config import load_config
 from src.utils.paths import prepare_test_paths
+from src.utils.freeze import print_trainable_params, setup_fc_only, setup_layer4_fc, setup_layer4_layer3_fc, setup_layer4_layer3_layer2_fc
 from src.utils.history import save_json, build_split_summary, build_split_patient_report
 from src.data.datamodule import build_test_loader
 from src.models.resnet50_binary import Resnet50
+from src.models.resnet34_binary import Resnet34
+from src.models.resnet18_binary import Resnet18
 from src.engine.evaluator import evaluate
 from src.metrics.patientwise import evaluate_patientwise, print_patient_case_rows
 from src.viz.confusion import print_patient_confusion_matrix
@@ -47,6 +50,7 @@ def test(cfg):
 
     test_loader = build_test_loader(cfg)
     model = Resnet50(cfg).to(device)
+    model = setup_layer4_fc(model)
 
     ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
     model.load_state_dict(ckpt["model"], strict=True)
