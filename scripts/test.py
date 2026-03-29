@@ -70,6 +70,40 @@ def test(cfg):
         cfg, threshold=best_t
     )
 
+    # Compare nearby thresholds for robustness analysis
+    candidate_thresholds = sorted(set([
+        round(best_t - 0.05, 2),
+        round(best_t, 2),
+        round(best_t + 0.05, 2),
+    ]))
+    candidate_thresholds = [t for t in candidate_thresholds if 0.0 <= t <= 1.0]
+
+    threshold_sweep = []
+
+    for t in candidate_thresholds:
+        te_pat_t = evaluate_patientwise(
+            model=model,
+            loader=test_loader,
+            device=device,
+            cfg=cfg,
+            threshold=float(t),
+        )
+
+        threshold_sweep.append({
+            "threshold": float(t),
+            "patients": int(te_pat_t["patients"]),
+            "loss": float(te_pat_t["loss"]),
+            "roc_auc": None if str(te_pat_t["roc_auc"]) == "nan" else float(te_pat_t["roc_auc"]),
+            "acc": float(te_pat_t["acc"]),
+            "precision": float(te_pat_t["precision"]),
+            "recall": float(te_pat_t["recall"]),
+            "f1": float(te_pat_t["f1"]),
+            "tp": int(te_pat_t["tp"]),
+            "fp": int(te_pat_t["fp"]),
+            "tn": int(te_pat_t["tn"]),
+            "fn": int(te_pat_t["fn"]),
+        })
+
     save_json(
         {
             "checkpoint_used": str(cfg.CKPT_PATH),
@@ -79,6 +113,7 @@ def test(cfg):
                 "acc": float(te["acc"]),
             },
             "patient_metrics": build_split_summary("test", te_pat)["metrics"],
+            "threshold_sweep_on_test": threshold_sweep,
         },
         cfg.LOG_DIR/ "test"/ "test_summary.json"
     )
@@ -105,14 +140,6 @@ def test(cfg):
           f"P={te_pat['precision']:.3f} R={te_pat['recall']:.3f} F1={te_pat['f1']:.3f} "
           f"(TP {te_pat['tp']} FP {te_pat['fp']} TN {te_pat['tn']} FN {te_pat['fn']})")
 
-    # Compare nearby thresholds for robustness analysis
-    candidate_thresholds = sorted(set([
-        round(best_t - 0.05, 2),
-        round(best_t, 2),
-        round(best_t + 0.05, 2),
-    ]))
-    candidate_thresholds = [t for t in candidate_thresholds if 0.0 <= t <= 1.0]
-
     print("\nNearby-threshold comparison on test:")
     for t in candidate_thresholds:
         te_pat_t = evaluate_patientwise(
@@ -131,7 +158,7 @@ def test(cfg):
             f"F1={te_pat_t['f1']:.3f} "
             f"(TP {te_pat_t['tp']} FP {te_pat_t['fp']} TN {te_pat_t['tn']} FN {te_pat_t['fn']})"
         )
-        
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default=str(PROJECT_ROOT / "configs" / "default.yaml"))
